@@ -10,10 +10,8 @@
       background: #f4f4f4;
       margin: 0;
       padding: 0;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
     }
+
     .container {
       max-width: 800px;
       margin: auto;
@@ -23,21 +21,25 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     h1 {
       text-align: center;
       color: #333;
     }
+
     form label {
       margin-top: 10px;
       font-weight: bold;
     }
-    input, select, textarea {
+
+    input, select {
       padding: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 5px;
       width: 100%;
     }
+
     button {
       margin-top: 20px;
       padding: 10px;
@@ -48,67 +50,114 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     button:hover {
       background: #0056b3;
     }
+
     .receipt-box {
       padding: 20px;
       border: 1px solid #ccc;
       border-radius: 10px;
       margin-top: 30px;
+      position: relative;
     }
+
     .header {
       display: flex;
       align-items: center;
-      gap: 20px;
+      justify-content: center;
+      text-align: center;
       margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
+
     .logo img {
       width: 80px;
       height: auto;
       border-radius: 10px;
     }
+
     .company-details {
-      font-size: 16px;
-      line-height: 1.4;
-      text-align: center;
-      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    .company-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .company-address {
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
     .divider {
       border-top: 2px solid black;
       margin: 10px 0;
     }
+
     .receipt-info {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 40px;
       font-size: 15px;
-    }
-    .receipt-info div {
       margin-top: 10px;
-      flex: 1 1 45%;
     }
+
     .services-table {
       width: 100%;
       margin-top: 20px;
+      margin-bottom: 30px;
       border-collapse: collapse;
     }
+
     .services-table th, .services-table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
+      padding: 10px;
     }
+
+    .services-table th {
+      text-align: left;
+      font-weight: bold;
+      border-bottom: 2px solid #000;
+    }
+
+    .services-table td:nth-child(3),
+    .services-table th:nth-child(3) {
+      text-align: right;
+    }
+
+    .services-table tr.empty-row td {
+      color: transparent;
+    }
+
     .total-row {
       text-align: right;
       font-weight: bold;
+      border-top: 2px solid #000;
     }
+
     .signature {
-      margin-top: 30px;
+      margin-top: 40px;
       text-align: right;
+      font-size: 14px;
     }
+
     .signature img {
-      height: 60px;
+      height: 40px;
+      margin-bottom: -10px;
     }
+
+    .thank-you-note {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 16px;
+      color: #444;
+    }
+
     .add-btn {
       margin-top: 10px;
       background: #28a745;
@@ -150,9 +199,11 @@
           <img src="logo.jpg" alt="Logo">
         </div>
         <div class="company-details">
-          <strong>Ananta's Electrical and Plumbing Services</strong><br>
-          Shyam Nagar Colony, Marripalem,<br>
-          Visakhapatnam - 530018
+          <div class="company-name">Ananta's Electrical and Plumbing Services</div>
+          <div class="company-address">
+            Shyam Nagar Colony, Marripalem,<br>
+            Visakhapatnam - 530018
+          </div>
         </div>
       </div>
 
@@ -187,7 +238,7 @@
         <p>Authorized Signature</p>
       </div>
 
-      <div style="text-align: center; margin-top: 30px; font-size: 16px; color: #444;">
+      <div class="thank-you-note">
         Thank you for contacting <strong>Ananta's Electrical and Plumbing Services</strong>.<br>
         We appreciate your business!
       </div>
@@ -235,25 +286,29 @@
 
       const tbody = document.getElementById('servicesTable').querySelector('tbody');
       tbody.innerHTML = '';
+
       const descInputs = document.querySelectorAll('.desc');
       const amtInputs = document.querySelectorAll('.amt');
 
       let total = 0;
-      for (let i = 0; i < descInputs.length; i++) {
+      const count = descInputs.length;
+
+      for (let i = 0; i < count; i++) {
         const row = document.createElement('tr');
-        const serial = document.createElement('td');
-        const desc = document.createElement('td');
-        const amt = document.createElement('td');
-
-        serial.textContent = i + 1;
-        desc.textContent = descInputs[i].value;
-        amt.textContent = parseFloat(amtInputs[i].value).toFixed(2);
-        total += parseFloat(amtInputs[i].value);
-
-        row.appendChild(serial);
-        row.appendChild(desc);
-        row.appendChild(amt);
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${descInputs[i].value}</td>
+          <td>${parseFloat(amtInputs[i].value).toFixed(2)}</td>
+        `;
         tbody.appendChild(row);
+        total += parseFloat(amtInputs[i].value);
+      }
+
+      for (let j = count; j < 5; j++) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.className = 'empty-row';
+        emptyRow.innerHTML = `<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>`;
+        tbody.appendChild(emptyRow);
       }
 
       document.getElementById('r_totalAmount').textContent = total.toFixed(2);
