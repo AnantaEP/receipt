@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ananta's Receipt Generator</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .address {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .receipt-box {
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+    .receipt-box h2 {
+      text-align: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+    }
+    .bill-table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    .bill-table td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    .logo img {
+      width: 100px;
+      height: auto;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ananta's Electrical and Plumbing Services</h1>
+    <p class="address">Shyam Nagar Colony, Marripalem, Visakhapatnam - 530018</p>
+
+    <form id="receiptForm">
+      <label>Client Name:</label>
+      <input type="text" id="clientName" required />
+
+      <label>Type of Service:</label>
+      <select id="serviceType">
+        <option>Electrical</option>
+        <option>Plumbing</option>
+        <option>Water Purifier</option>
+      </select>
+
+      <label>Description:</label>
+      <textarea id="description" required></textarea>
+
+      <label>Amount (₹):</label>
+      <input type="number" id="amount" required />
+
+      <label>Date:</label>
+      <input type="date" id="date" required />
+
+      <label>Payment Mode:</label>
+      <select id="paymentMode">
+        <option>Cash</option>
+        <option>UPI</option>
+      </select>
+
+      <button type="submit">Generate Receipt PDF</button>
+    </form>
+
+    <!-- Detailed styled receipt -->
+    <div id="receipt" class="receipt-box" style="display: none;">
+      <div class="logo">
+        <img src="logo.jpg" alt="Company Logo">
+      </div>
+      <h2>Payment Receipt</h2>
+      <div class="header">
+        <strong>Ananta's Electrical and Plumbing Services</strong><br>
+        Shyam Nagar Colony, Marripalem, Visakhapatnam - 530018
+      </div>
+
+      <table class="bill-table">
+        <tr>
+          <td><strong>Client Name:</strong></td>
+          <td id="r_clientName"></td>
+        </tr>
+        <tr>
+          <td><strong>Service Type:</strong></td>
+          <td id="r_serviceType"></td>
+        </tr>
+        <tr>
+          <td><strong>Description:</strong></td>
+          <td id="r_description"></td>
+        </tr>
+        <tr>
+          <td><strong>Amount:</strong></td>
+          <td>₹<span id="r_amount"></span></td>
+        </tr>
+        <tr>
+          <td><strong>Date:</strong></td>
+          <td id="r_date"></td>
+        </tr>
+        <tr>
+          <td><strong>Payment Mode:</strong></td>
+          <td id="r_paymentMode"></td>
+        </tr>
+      </table>
+
+      <div class="footer">
+        <p><strong>Total Amount Paid:</strong> ₹<span id="r_amount_footer"></span></p>
+        <p><strong>Thank you for your business!</strong></p>
+        <p>This is a computer-generated receipt and does not require a signature.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="html2pdf.bundle.min.js"></script>
+  <script>
+    document.getElementById('receiptForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const clientName = document.getElementById('clientName').value;
+      const serviceType = document.getElementById('serviceType').value;
+      const description = document.getElementById('description').value;
+      const amount = document.getElementById('amount').value;
+      const date = document.getElementById('date').value;
+      const paymentMode = document.getElementById('paymentMode').value;
+
+      document.getElementById('r_clientName').textContent = clientName;
+      document.getElementById('r_serviceType').textContent = serviceType;
+      document.getElementById('r_description').textContent = description;
+      document.getElementById('r_amount').textContent = amount;
+      document.getElementById('r_date').textContent = date;
+      document.getElementById('r_paymentMode').textContent = paymentMode;
+      document.getElementById('r_amount_footer').textContent = amount;
+
+      const receipt = document.getElementById('receipt');
+      receipt.style.display = 'block';
+
+      html2pdf()
+        .from(receipt)
+        .set({ filename: `${clientName}_receipt.pdf` })
+        .save()
+        .then(() => {
+          receipt.style.display = 'none';
+        });
+    });
+  </script>
+</body>
+</html>
